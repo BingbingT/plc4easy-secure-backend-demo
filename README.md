@@ -1,4 +1,4 @@
-# Secure Device API (NestJS Backend Demo)
+# PLC4Easy — Secure Device API (NestJS Backend Demo)
 
 ## Overview
 
@@ -195,3 +195,86 @@ This project was built to demonstrate:
 
 Built as part of a focused effort to develop **production-ready backend and security skills**.
 
+## Security
+### Threat Model
+This project considers common backend security risks and demonstrates how they are mitigated in a simple API.
+
+### Assets to Protect
+- Admin authentication credentials
+- JWT signing secret
+- Protected API endpoints
+- Integrity of submitted device data
+
+### Entry Points
+- `POST /auth/login`
+- `GET /devices`
+- `POST /devices`
+
+### Trust Boundaries
+- Incoming client requests
+- Environment variables (secrets and credentials)
+- Protected routes requiring authentication
+
+---
+
+### Threat: Unauthorized Access
+Attackers may attempt to access protected endpoints without valid authentication.
+
+**Mitigation**
+- JWT-based authentication is required
+- Protected routes use `JwtAuthGuard`
+- Unauthorized requests return `401 Unauthorized`
+
+---
+
+### Threat: Credential Abuse
+Attackers may attempt to guess or misuse login credentials.
+
+**Mitigation**
+- Passwords are verified using `bcrypt`
+- Invalid login attempts return `401 Unauthorized`
+- Credentials are stored in environment variables (not hardcoded)
+
+---
+
+### Threat: Malicious or Invalid Input
+Attackers may submit malformed or unexpected data.
+
+**Mitigation**
+- DTO validation with `class-validator`
+- Global `ValidationPipe` enforces schema
+- `whitelist` removes unknown fields
+- Invalid input returns `400 Bad Request`
+
+---
+
+### Threat: Secret Exposure
+Sensitive values such as `JWT_SECRET` could be exposed.
+
+**Mitigation**
+- Secrets are stored in environment variables
+- `.env` is excluded from version control
+- `.env.example` provides safe placeholders
+
+---
+
+### Threat: Token Misuse
+Attackers may use expired or invalid JWTs.
+
+**Mitigation**
+- JWTs are validated via Passport strategy
+- Expired or invalid tokens are rejected automatically
+
+---
+
+### Security Design Notes
+This project focuses on core backend security practices:
+- Authentication (JWT)
+- Route protection (guards)
+- Input validation (DTO + ValidationPipe)
+- Secure configuration (environment variables)
+
+Future improvements could include:
+- Rate limiting
+- Role-based access control (RBAC)
+- Logging and monitoring
